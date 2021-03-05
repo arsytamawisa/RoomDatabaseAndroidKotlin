@@ -2,43 +2,42 @@ package com.example.todoapp
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.ViewManager
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.todoapp.data.Todo
+import com.example.todoapp.data.TodoViewModel
 import com.example.todoapp.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
-    lateinit var recyclerView: RecyclerView
-    lateinit var viewAdapter: RecyclerView.Adapter<*>
-    lateinit var viewManager: RecyclerView.LayoutManager
-    lateinit var binding: ActivityMainBinding
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var viewAdapter: TodoAdapter
+    private lateinit var viewManager: RecyclerView.LayoutManager
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var viewModel: TodoViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val todos = mutableListOf(
-            "todo 1", "todo 2"
-        )
+        viewModel = ViewModelProviders.of(this).get(TodoViewModel::class.java)
+
+        viewManager = LinearLayoutManager(this)
+        viewAdapter = TodoAdapter(viewModel)
+        recyclerView = binding.myRecyclerView
+
+        recyclerView.apply {
+            layoutManager = viewManager
+            adapter = viewAdapter
+        }
 
         binding.apply {
             btnNew.setOnClickListener {
-                todos.add(editTextAdd.text.toString())
+                viewModel.todos.value!!.add(Todo(3, editTextAdd.text.toString()))
                 editTextAdd.text.clear()
             }
-        }
-
-
-        viewManager = LinearLayoutManager(this)
-        viewAdapter = TodoAdapter(todos)
-
-        binding.myRecyclerView.apply {
-            layoutManager = viewManager
-            adapter = viewAdapter
         }
     }
 }
