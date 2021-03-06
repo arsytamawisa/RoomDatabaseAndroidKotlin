@@ -24,7 +24,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         viewModel = ViewModelProviders.of(this).get(TodoViewModel::class.java)
-
         viewManager = LinearLayoutManager(this)
         viewAdapter = TodoAdapter(viewModel)
         recyclerView = binding.myRecyclerView

@@ -26,10 +26,10 @@ class TodoAdapter(private val viewModel: TodoViewModel) :
 
         /* Remove */
         viewHolder.delBtn.setOnClickListener {
-            viewModel.removeTodo(viewHolder.adapterPosition)
-
+            viewModel.removeTodo(getItem(viewHolder.adapterPosition))
         }
 
+        /* Edit */
         viewHolder.editBtn.setOnClickListener {
             val context = viewHolder.itemView.context
             val inflater = LayoutInflater.from(context)

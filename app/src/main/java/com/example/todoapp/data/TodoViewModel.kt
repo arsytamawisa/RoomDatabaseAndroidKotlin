@@ -3,39 +3,45 @@ package com.example.todoapp.data
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
-class TodoViewModel: ViewModel() {
+class TodoViewModel(application: Application): AndroidViewModel(application) {
+    private val repository : TodoRepository
+    private val todoDao : TodoDao
+    private var job = Job()
+    private val uiScope = CoroutineScope(Dispatchers.IO + job)
 
-//    private val repository : TodoRepository
-//    private val todoDao : TodoDao
-    private val _todos = MutableLiveData<ArrayList<Todo>>()
-    val todos : LiveData<ArrayList<Todo>>
+    private var _todos : LiveData<List<Todo>>
+    val todos : LiveData<List<Todo>>
         get() = _todos
 
     init {
-        _todos.value = arrayListOf(
-            Todo(1,"mandi"),
-            Todo(2,"ngoding")
-        )
-//        todoDao = TodoDatabase
-//            .getInstance(application).todoDao()
+        todoDao = TodoDatabase.getInstance(application).todoDao()
+        repository = TodoRepository(todoDao)
+        _todos = repository.findAll
     }
 
     fun addTodo(text: String) {
-        val newId = _todos.value!!.size + 1
-        _todos.value!!.add(Todo(newId, text))
-        _todos.postValue(_todos.value)
+        uiScope.launch {
+            repository.insert(Todo(0, text))
+        }
     }
 
-    fun removeTodo(pos: Int) {
-        _todos.value!!.removeAt(pos)
-        _todos.postValue(_todos.value)
+    fun removeTodo(todo: Todo) {
+        uiScope.launch {
+            repository.delete(todo)
+        }
     }
 
     fun updateTodo(pos: Int, text: String) {
-        _todos.value!![pos].task = text
-        _todos.postValue(_todos.value)
+
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        job.cancel()
     }
 }
