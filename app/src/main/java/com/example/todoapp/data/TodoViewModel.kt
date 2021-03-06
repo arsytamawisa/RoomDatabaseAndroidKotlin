@@ -23,9 +23,19 @@ class TodoViewModel: ViewModel() {
 //            .getInstance(application).todoDao()
     }
 
-//    fun addTodo(text: String) {
-//        val newId = todos.value!!.size + 1
-//        _todos.value!!.removeAt(pos)
-//
-//    }
+    fun addTodo(text: String) {
+        val newId = _todos.value!!.size + 1
+        _todos.value!!.add(Todo(newId, text))
+        _todos.postValue(_todos.value)
+    }
+
+    fun removeTodo(pos: Int) {
+        _todos.value!!.removeAt(pos)
+        _todos.postValue(_todos.value)
+    }
+
+    fun updateTodo(pos: Int, text: String) {
+        _todos.value!![pos].task = text
+        _todos.postValue(_todos.value)
+    }
 }

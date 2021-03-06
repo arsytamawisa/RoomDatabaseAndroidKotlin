@@ -2,6 +2,7 @@ package com.example.todoapp
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -12,9 +13,9 @@ import com.example.todoapp.databinding.ActivityMainBinding
 class MainActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
-    private lateinit var viewAdapter: TodoAdapter
     private lateinit var viewManager: RecyclerView.LayoutManager
     private lateinit var binding: ActivityMainBinding
+    private lateinit var viewAdapter: TodoAdapter
     private lateinit var viewModel: TodoViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,9 +36,13 @@ class MainActivity : AppCompatActivity() {
 
         binding.apply {
             btnNew.setOnClickListener {
-                viewModel.todos.value!!.add(Todo(3, editTextAdd.text.toString()))
+                viewModel.addTodo(editTextAdd.text.toString())
                 editTextAdd.text.clear()
             }
         }
+
+        viewModel.todos.observe(this, Observer {
+            viewAdapter.submitList(it.toMutableList())
+        })
     }
 }
